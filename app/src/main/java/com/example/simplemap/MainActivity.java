@@ -19,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double mLatitud;
     private double mLongitud;
     private LocationListener mLocationListener;
+    private Marker mCurrentLocation;
+    private GoogleMap mGooglemap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mLatitud = location.getLatitude();
                 mLongitud = location.getLongitude();
                 Log.d(TAG, "onLocationChanged: " + mLatitud + " " + mLongitud);
+                if (mCurrentLocation != null) {
+                    mCurrentLocation.remove();
+                }
+                LatLng newlocation = new LatLng(mLatitud, mLongitud);
+                mGooglemap.addMarker(new MarkerOptions().position(newlocation).title("Current location Marker"));
+                mGooglemap.moveCamera(CameraUpdateFactory.newLatLng(newlocation));
             }
 
             @Override
@@ -80,9 +89,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap map) {
-        Log.d(TAG, "onMapReady: ");
+        mGooglemap = map;
         LatLng mexico = new LatLng(19.4326077, -99.13320799999997);
-        map.addMarker(new MarkerOptions().position(mexico).title("Marker in Mexico"));
+        mCurrentLocation = map.addMarker(new MarkerOptions().position(mexico).title("Marker in Mexico"));
         map.moveCamera(CameraUpdateFactory.newLatLng(mexico));
     }
 
